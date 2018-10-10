@@ -52,6 +52,55 @@ void sectorJudge(BLDC_SVPWMTypeDef* svpwm)
 		while(1); //computation error
 	}
 }
+int32_t sectorJudge_v2(BLDC_SVPWMTypeDef* svpwm)
+{
+	float U1,U2,U3;
+	int32_t A,B,C,N,b_sector1;
+	
+	U1 = svpwm->b_VrefBeta;
+	U2 = 0.8660*svpwm->b_VrefAlpha - svpwm->b_VrefBeta*0.5;
+	U3 = -0.8660*svpwm->b_VrefAlpha - svpwm->b_VrefBeta*0.5;
+
+	if(U1>0)	{
+		A=1;
+	}
+	else	{
+		A=0;
+	}
+	if(U2>0)	{
+		B=1;
+	}
+	else	{
+    		B=0;
+	}
+	if(U3>0)	{
+		C=1;
+	}
+	else	{
+    		C=0;
+	}
+    
+	N = 4*C +2*B +A;
+	if( N==3)	{
+		b_sector1 = 1;
+	}
+	else if( N==1){		
+    		b_sector1 = 2;
+	}
+	else if( N==5)	{
+    		b_sector1 = 3;
+	}
+	else if( N==4)	{
+    		b_sector1 = 4;
+	}
+	else if (N==6)	{
+    		b_sector1 = 5;
+	}
+	else if( N==2)	{
+    		b_sector1 = 6;
+	}	
+	return b_sector1;
+}
 void SpaceVectorUpdate(BLDC_SVPWMTypeDef* svpwm)
 {
 	switch(svpwm->b_sector)
@@ -223,11 +272,11 @@ void SVPWM1_SpaceVectorDRV_v2(uint8_t spaceVectorOut)
   uint32_t tmpccmrx = 0U;
 	
 	
-	// ¸üĞÂ±¾´ÎµÄ¿Õ¼äÊ¸Á¿
+	// æ›´æ–°æœ¬æ¬¡çš„ç©ºé—´çŸ¢é‡
 	HAL_TIM_GenerateEvent(htim1, TIM_EVENTSOURCE_COM);
 	
 	
-	// ×°ÔØÏÂ´ÎĞèÒª·¢³öµÄ¿Õ¼äÊ¸Á¿
+	// è£…è½½ä¸‹æ¬¡éœ€è¦å‘å‡ºçš„ç©ºé—´çŸ¢é‡
 	// CCxE CCxNE OCxM
 	// OC1M OC2M in CCMR1			OC3M OC4M in CCMR2
 	if(spaceVectorOut==0)

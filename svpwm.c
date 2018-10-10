@@ -475,7 +475,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		svpwm1.b_VrefA  = svpwm1.Vm * cos(6.2832*svpwm1.b_freq*svpwm1.b_TIM1PrdCnt/5000.0);
 		svpwm1.b_VrefB  = svpwm1.Vm * cos(6.2832*svpwm1.b_freq*svpwm1.b_TIM1PrdCnt/5000.0 - 6.2832/3.0);
 		svpwm1.b_VrefC  = svpwm1.Vm * cos(6.2832*svpwm1.b_freq*svpwm1.b_TIM1PrdCnt/5000.0 + 6.2832/3.0);
-	
+		
+		// 0 <= Vm <=1
+		// to avoid over modulation, scale down the Vref
+		svpwm1.b_VrefA *= 0.8660;
+		svpwm1.b_VrefB *= 0.8660;
+		svpwm1.b_VrefC *= 0.8660;
+		
 		Clark_Transformation(&svpwm1.b_VrefA, &svpwm1.b_VrefB, &svpwm1.b_VrefC, &svpwm1.b_VrefAlpha, &svpwm1.b_VrefBeta);
 		sectorJudge(&svpwm1);
 		SpaceVectorUpdate(&svpwm1);
